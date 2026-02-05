@@ -1,0 +1,79 @@
+import numpy as np
+
+class kin():
+    def __init__(self, inputs):
+
+        self.inputs = inputs
+
+        self.num_links = inputs.shape[0]
+        print("links:" , self.num_links, "\n")
+
+        self.frames = []
+        self.combined_frames = []
+        self.each_frame = [0]
+        self.cords = []
+
+    def coordinates(self):
+        trans = kin.Transformation(self)
+        self.cords.append(np.zeros(3))
+        for i in range(self.num_links):
+            self.cords.append(trans[i][0:3, 3])
+            print(self.cords)
+        return self.cords
+    def Transformation(self):
+        #creates list of nested arrays for each frame
+        u = 0
+        p = 1
+        #dont question greatness
+        for i in range(self.num_links):
+            #Append all Rotations; Matrix multiply immediately rather than creating unnessesary additional frame
+            self.frames.append(self.shell_matrix())
+
+            yaw = kin.yaw(self.inputs[i,0])
+            pitch = kin.pitch(self.inputs[i,3])
+
+            self.frames[u][0:3 , 0:3] =  np.matmul(yaw, pitch)
+
+            #Append all translations
+            self.frames.append(self.shell_matrix())
+            self.frames[p][0,3] = self.inputs[i][2]
+
+            self.combined_frames.append(np.matmul(self.frames[u], self.frames[p]))
+            u+=2
+            p+=2
+
+        self.each_frame[0] = self.combined_frames[0]
+
+        for i in range(1, self.num_links):
+            #print("\nindex now" , i-1)
+            self.each_frame.append(np.matmul(self.each_frame[i-1], self.combined_frames[i]))
+        #populates array with each joint
+            #print("each frame as it goes:\n" , each_frame[i-1])
+        return self.each_frame
+
+        #theta is yaw ; d is disp in z
+    #alpha is pitch ; a is disp in x
+    def shell_matrix(self):
+        shell = np.eye(4)
+        return shell
+    def yaw(alpha):
+        alpha = np.deg2rad(alpha)
+        return np.array([
+            [np.cos(alpha) , -np.sin(alpha) , 0],
+            [np.sin(alpha) , np.cos(alpha) , 0] , 
+            [0 , 0 , 1]
+        ])
+    def pitch(beta):
+        beta = np.deg2rad(beta)
+        return np.array([
+            [np.cos(beta) , 0 , np.sin(beta)],
+            [0 , 1 , 0] , 
+            [-np.sin(beta) , 0 , np.cos(beta)]
+        ])
+    def roll(gamma):
+        gamma = np.deg2rad(gamma)
+        return np.array([
+            [1 , 0 , 0],
+            [0 , np.cos(gamma) , -np.sin(gamma)] , 
+            [0 , np.sin(gamma) , np.cos(gamma)]
+        ])
