@@ -45,17 +45,16 @@ class kin():
         self.each_frame[0] = self.combined_frames[0]
 
         for i in range(1, self.num_links):
-            #print("\nindex now" , i-1)
             self.each_frame.append(np.matmul(self.each_frame[i-1], self.combined_frames[i]))
-        #populates array with each joint
-            #print("each frame as it goes:\n" , each_frame[i-1])
         return self.each_frame
 
-        #theta is yaw ; d is disp in z
-    #alpha is pitch ; a is disp in x
+    #theta = yaw ;  d = z translation
+    #alpha = pitch; a = x translation
     def shell_matrix(self):
         shell = np.eye(4)
         return shell
+    
+    #euler angles as inputs for all rotation matricies
     def yaw(alpha):
         alpha = np.deg2rad(alpha)
         return np.array([

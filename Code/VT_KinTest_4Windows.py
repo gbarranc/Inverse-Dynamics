@@ -5,7 +5,8 @@ import pyqtgraph.opengl as gl
 import numpy as np
 import ForwardKinematics
 
-#two joint skeleton; i turn all the knobs
+#Create widgets to display arm in 3D space
+#Links and rotations are currently arbitrary and defined at the bottom
 class Main_Window(QtWidgets.QMainWindow):
     def __init__(self, cords, Acceleration_3D):
         super().__init__()
@@ -49,8 +50,8 @@ class Main_Window(QtWidgets.QMainWindow):
         self.zgrid = gl.GLGridItem()
 
         # Rotationally offset grids to align with axes
-        self.xgrid.rotate(90, 0, 1, 0)  # Rotate around Y-axis
-        self.ygrid.rotate(90, 1, 0, 0)  # Rotate around X-axis
+        self.xgrid.rotate(90, 0, 1, 0)  # Y-axis
+        self.ygrid.rotate(90, 1, 0, 0)  # X-axis
 
         # Add grids to window
         self.view3D.addItem(self.xgrid)
@@ -66,6 +67,7 @@ class Main_Window(QtWidgets.QMainWindow):
         self.layout.addWidget(self.view2D_Q2, 1, 0)
         self.layout.addWidget(self.view2D_Q3, 1, 1)
 
+        #range is arbitrary; should update once actual actuated members are added so it does not escape the bounds
         self.view2D_Q1.setTitle("ax", color="b", size="15pt")
         self.view2D_Q1.showGrid(x=True, y=True)
         self.view2D_Q1.setXRange(0, 5)
@@ -89,16 +91,18 @@ class Main_Window(QtWidgets.QMainWindow):
             pass
 
     def Update_3D(self):
-        #add links and joints
-
-        #self.cords = self.cords[:][0] + 10
+        #add links and joints; automated wrt cords matrix
         self.links = gl.GLLinePlotItem(pos=self.cords, color=(1, 0, 0, 1), width=3)
+
+        #note: would be cool to make the color as a function of stress tensor at the respective joint; i.e. red joint = bad
         self.joints = gl.GLScatterPlotItem(pos=self.cords, color=(1, 1, 1, 1), size=10)
         # Add to view
         self.view3D.addItem(self.links)
         self.view3D.addItem(self.joints)
 
     def Update_2D(self):
+
+        #2D plots are currently arbitarty acceleration functions; can make meaningful with polar cords at each joint.
         penx = pg.mkPen(color=(0, 0, 255), width=5, style=QtCore.Qt.DashLine)
         peny = pg.mkPen(color=(255, 255, 0), width=5, style=QtCore.Qt.DashLine)
         penz = pg.mkPen(color=(0, 255, 0), width=5, style=QtCore.Qt.DashLine)
@@ -130,6 +134,8 @@ class Main_Window(QtWidgets.QMainWindow):
             symbolSize=10,
             symbolBrush="g",
         )
+
+#inputs are based on DH parameters; standard robotics workflow
 
 inputs = np.array([
     #theta(i) , d(i) , a(i) , alpha(i)
