@@ -1,4 +1,4 @@
-As a courtesey, here are all the libraries installed in my local repo:
+As a courtesy, here are all the libraries installed in my local repo:
 
 numpy               2.4.2
 OpenGLContext       2.3.0b1
