@@ -1,4 +1,4 @@
-As a courtesey, here are all the packets installed in my cloned repo:
+As a courtesey, here are all the packets installed in my local repo:
 
 numpy               2.4.2
 OpenGLContext       2.3.0b1
