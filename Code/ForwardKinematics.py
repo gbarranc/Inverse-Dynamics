@@ -27,6 +27,10 @@ class kin():
         #dont question greatness
         for i in range(self.num_links):
             #Append all Rotations; Matrix multiply immediately rather than creating unnessesary additional frame
+
+
+
+            print("\n\n\n\n\n" , i, "\n\n\n")
             self.frames.append(self.shell_matrix())
 
             yaw = kin.yaw(self.inputs[i,0])
@@ -37,6 +41,7 @@ class kin():
             #Append all translations
             self.frames.append(self.shell_matrix())
             self.frames[p][0,3] = self.inputs[i][2]
+            self.frames[p][1,3] = self.inputs[i][2]
 
             self.combined_frames.append(np.matmul(self.frames[u], self.frames[p]))
             u+=2
@@ -76,3 +81,20 @@ class kin():
             [0 , np.cos(gamma) , -np.sin(gamma)] , 
             [0 , np.sin(gamma) , np.cos(gamma)]
         ])
+
+inputs3D = np.array([
+    #theta(i) , d(i) , a(i) , alpha(i)
+    [45,  0 , 2  , 45],
+    [0 ,  0 , 3 , -90],
+    [0 , 0 , 1 , 0],
+    [45,  0 , 2  , 45],
+    [0 ,  0 , 3 , -90],
+    [90 , 0 , 1 , 0]
+])
+
+
+main  = kin(inputs3D)
+
+result  = main.coordinates()
+
+print(result)
